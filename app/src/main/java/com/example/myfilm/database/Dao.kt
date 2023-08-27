@@ -17,5 +17,10 @@ interface UserDao{
 
     @Query("UPDATE user SET isLogin = :isLogin where id = :id")
     suspend fun updateUser(id: Int, isLogin: Boolean)
+}
 
+@Dao
+interface  MovieDao{
+    @Insert
+    suspend fun insertMovieFav(movieFav: MovieEntity)
 }

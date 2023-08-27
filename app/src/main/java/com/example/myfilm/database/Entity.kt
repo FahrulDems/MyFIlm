@@ -13,3 +13,13 @@ data class User(
     val password: String,
     val isLogin: Boolean = false
 )
+
+@Entity(tableName = "movies_fav")
+data class MovieEntity(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
+
+    val title: String,
+    val poster_path: String,
+    val overview: String
+)
