@@ -2,7 +2,6 @@ package com.example.myfilm.screen
 
 import android.util.Log
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -132,7 +131,7 @@ fun HomeScreen(navController: NavController) {
         BottomBar(
             selectedTab = selectedTab,
             onLogoutClicked = {
-                navController.navigate("login") {
+                navController.navigate("login"){
                     popUpTo("login") { inclusive = true }
                 }
             }) { newIndex ->
@@ -144,12 +143,6 @@ fun HomeScreen(navController: NavController) {
             }
         }
     }
-}
-
-fun AppCompatActivity.restartActivity() {
-    val intent = intent
-    finish()
-    startActivity(intent)
 }
 
 private fun navigateToScreen(navController: NavController, index: Int) {
@@ -191,12 +184,12 @@ fun BottomBar(selectedTab: Int, onLogoutClicked: () -> Unit, onTabSelected: (Int
             isSelected = false,
             onClick = {
                 CoroutineScope(Dispatchers.IO).launch {
-                    userDao.updateUser(userLogin!!.id, false)
-                    withContext(Dispatchers.Main){
-                        onLogoutClicked()
-                        Toast.makeText(context, "You are logout now", Toast.LENGTH_SHORT).show()
-                        if (context is AppCompatActivity) {
-                            context.restartActivity()
+                    val user = userDao.getUserByLogin(true)
+                    user?.let{nonNullUser ->
+                        withContext(Dispatchers.Main){
+                            userDao.updateUser(nonNullUser.id, false)
+                            onLogoutClicked()
+                            Toast.makeText(context, "You are logout now", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
