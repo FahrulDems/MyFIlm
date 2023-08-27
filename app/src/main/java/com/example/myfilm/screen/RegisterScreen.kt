@@ -150,9 +150,7 @@ fun RegisterScreen(navController: NavController) {
             Spacer(modifier = Modifier.heightIn(min = 25.dp))
 
             // Password Field
-            val passwordVisible = remember {
-                mutableStateOf(false)
-            }
+            val passwordVisible = remember {mutableStateOf(false)}
             OutlinedTextField(
                 value = registrationInput.value.password,
                 onValueChange = { newValue ->
@@ -216,6 +214,7 @@ fun RegisterScreen(navController: NavController) {
                             Log.d("DatabaseLogging", "Data inserted: $entity")
                         }
                         navController.navigate("login")
+                        Toast.makeText(context, "Success reegister account", Toast.LENGTH_SHORT).show()
                     } else {
                         Toast.makeText(context, "Fields must not be empty", Toast.LENGTH_SHORT).show()
                     }

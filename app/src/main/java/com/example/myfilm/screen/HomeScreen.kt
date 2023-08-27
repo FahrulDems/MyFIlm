@@ -1,6 +1,8 @@
 package com.example.myfilm.screen
 
 import android.util.Log
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -41,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,7 +53,11 @@ import com.example.myfilm.data.Movie
 import com.example.myfilm.data.MovieResponse
 import com.example.myfilm.data.authorozationHeader
 import com.example.myfilm.data.movieApiService
+import com.example.myfilm.database.MyApplication
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun HomeScreen(navController: NavController) {
@@ -139,6 +146,12 @@ fun HomeScreen(navController: NavController) {
     }
 }
 
+fun AppCompatActivity.restartActivity() {
+    val intent = intent
+    finish()
+    startActivity(intent)
+}
+
 private fun navigateToScreen(navController: NavController, index: Int) {
     when (index) {
         0 -> navController.navigate("home")
@@ -162,7 +175,7 @@ fun BottomBar(selectedTab: Int, onLogoutClicked: () -> Unit, onTabSelected: (Int
             isSelected = selectedTab == 0,
             onClick = { onTabSelected(0) }
         )
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier =Modifier.width(16.dp))
         BottomBarItem(
             icon = Icons.Default.Favorite,
             label = "Favorites",
@@ -170,11 +183,24 @@ fun BottomBar(selectedTab: Int, onLogoutClicked: () -> Unit, onTabSelected: (Int
             onClick = { onTabSelected(1) }
         )
         Spacer(modifier = Modifier.width(16.dp))
+        val context = LocalContext.current
+        val userDao = (context.applicationContext as MyApplication).database.userDao()
         BottomBarItem(
             icon = Icons.Default.Logout,
             label = "Logout",
             isSelected = false,
-            onClick = { onLogoutClicked() }
+            onClick = {
+                CoroutineScope(Dispatchers.IO).launch {
+                    userDao.updateUser(userLogin!!.id, false)
+                    withContext(Dispatchers.Main){
+                        onLogoutClicked()
+                        Toast.makeText(context, "You are logout now", Toast.LENGTH_SHORT).show()
+                        if (context is AppCompatActivity) {
+                            context.restartActivity()
+                        }
+                    }
+                }
+            }
         )
     }
 }

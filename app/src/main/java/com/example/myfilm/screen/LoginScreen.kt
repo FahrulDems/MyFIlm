@@ -32,6 +32,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -46,10 +47,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.myfilm.R
 import com.example.myfilm.appcomponent.ButtonComponent
 import com.example.myfilm.appcomponent.HeadingTextComponent
 import com.example.myfilm.database.MyApplication
+import com.example.myfilm.database.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -59,12 +62,26 @@ import kotlinx.coroutines.withContext
 data class LoginInput(
     val email: String,
     val password: String
-) {
-    val emailIsEmpty: Boolean
-        get() = email.isEmpty()
+)
 
-    val passwordIsEmpty: Boolean
-        get() = password.isEmpty()
+var userLogin: User? = null
+
+@Composable
+fun PreLoginScreen(navController: NavController){
+    val context = LocalContext.current
+    val userDao = (context.applicationContext as MyApplication).database.userDao()
+
+    LaunchedEffect(key1 = true ){
+        val user = withContext(Dispatchers.IO){
+            userDao.getUserByLogin(true)
+        }
+        if (user != null){
+            userLogin = user
+            navController.navigate("home")
+        } else{
+            navController.navigate("login")
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -72,7 +89,6 @@ data class LoginInput(
 fun LoginScreen(onRegisterButtonClicked: () -> Unit, onLoginButtonClicked: () -> Unit) {
     val context = LocalContext.current
     val loginInput = remember { mutableStateOf(LoginInput("", "")) }
-
     Surface(
         color = Color(0xFFE9F1EF),
         modifier = Modifier
@@ -200,7 +216,9 @@ fun LoginScreen(onRegisterButtonClicked: () -> Unit, onLoginButtonClicked: () ->
                             val user = userDao.getUserByEmail(email)
                             withContext(Dispatchers.Main) {
                                 if (user != null && user.password == password) {
+                                    userDao.updateUser(user.id, true)
                                     onLoginButtonClicked()
+                                    Toast.makeText(context, "Login success", Toast.LENGTH_SHORT).show()
                                 } else {
                                     Toast.makeText(context, "Email or password Is not valid", Toast.LENGTH_SHORT).show()
                                 }

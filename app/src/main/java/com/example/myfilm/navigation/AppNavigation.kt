@@ -8,13 +8,17 @@ import com.example.myfilm.screen.DetailScreen
 import com.example.myfilm.screen.FavoritesScreen
 import com.example.myfilm.screen.HomeScreen
 import com.example.myfilm.screen.LoginScreen
+import com.example.myfilm.screen.PreLoginScreen
 import com.example.myfilm.screen.RegisterScreen
 
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "login")
+    NavHost(navController = navController, startDestination = "prelogin")
     {
+        composable("prelogin"){
+            PreLoginScreen(navController)
+        }
         composable("login") {
             LoginScreen(onLoginButtonClicked = { navController.navigate("home")},
                         onRegisterButtonClicked = {navController.navigate("register")})
