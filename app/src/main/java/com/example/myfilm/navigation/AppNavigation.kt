@@ -20,7 +20,7 @@ fun AppNavigation() {
             PreLoginScreen(navController)
         }
         composable("login") {
-            LoginScreen(onLoginButtonClicked = { navController.navigate("home")},
+            LoginScreen(onLoginButtonClicked = { navController.navigate("prelogin")},
                         onRegisterButtonClicked = {navController.navigate("register")})
         }
         composable("register") {

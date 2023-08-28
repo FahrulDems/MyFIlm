@@ -23,4 +23,6 @@ interface UserDao{
 interface  MovieDao{
     @Insert
     suspend fun insertMovieFav(movieFav: MovieEntity)
+    @Query("SELECT * FROM movies_fav WHERE user_id = :userId")
+    suspend fun getAllByUserId(userId: Int): List<MovieEntity>?
 }

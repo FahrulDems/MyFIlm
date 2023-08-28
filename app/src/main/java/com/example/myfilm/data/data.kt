@@ -10,14 +10,16 @@ import retrofit2.http.Path
 data class MovieResponse(
     val results: List<Movie>?
 )
-
+data class Genre(val name: String)
 data class Movie(
     val id: Int,
     val title: String,
     val poster_path: String,
     val overview: String,
     val vote_average: Double,
-    val vote_count: Int
+    val release_date: String,
+    val vote_count: Int,
+    val genres: List<Genre>? = null
 )
 
 interface MovieApiService {

@@ -43,7 +43,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -61,9 +60,9 @@ import kotlinx.coroutines.withContext
 @Composable
 fun HomeScreen(navController: NavController) {
     val scope = rememberCoroutineScope()
-    var popularMovieList by remember {mutableStateOf(emptyList<Movie>())}
-    var topRatedMovieList by remember {mutableStateOf(emptyList<Movie>())}
-    var nowPlayingMovieList by remember {mutableStateOf(emptyList<Movie>())}
+    var popularMovieList by remember { mutableStateOf(emptyList<Movie>()) }
+    var topRatedMovieList by remember { mutableStateOf(emptyList<Movie>()) }
+    var nowPlayingMovieList by remember { mutableStateOf(emptyList<Movie>()) }
 
     LaunchedEffect(key1 = true) {
         scope.launch {
@@ -112,7 +111,7 @@ fun HomeScreen(navController: NavController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 70.dp)
+                .padding(bottom = 40.dp)
         ) {
             LazyColumn {
                 item {
@@ -131,8 +130,8 @@ fun HomeScreen(navController: NavController) {
         BottomBar(
             selectedTab = selectedTab,
             onLogoutClicked = {
-                navController.navigate("login"){
-                    popUpTo("login") { inclusive = true }
+                navController.navigate("prelogin") {
+                    popUpTo("prelogin") { inclusive = true }
                 }
             }) { newIndex ->
             if (newIndex == selectedTab) {
@@ -157,8 +156,8 @@ fun BottomBar(selectedTab: Int, onLogoutClicked: () -> Unit, onTabSelected: (Int
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top =765.dp)
-            .height(70.dp)
+            .padding(top = 784.dp)
+            .height(60.dp)
             .background(Color(0xFF34806e)),
         horizontalArrangement = Arrangement.Center
     ) {
@@ -168,7 +167,7 @@ fun BottomBar(selectedTab: Int, onLogoutClicked: () -> Unit, onTabSelected: (Int
             isSelected = selectedTab == 0,
             onClick = { onTabSelected(0) }
         )
-        Spacer(modifier =Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(16.dp))
         BottomBarItem(
             icon = Icons.Default.Favorite,
             label = "Favorites",
@@ -185,8 +184,8 @@ fun BottomBar(selectedTab: Int, onLogoutClicked: () -> Unit, onTabSelected: (Int
             onClick = {
                 CoroutineScope(Dispatchers.IO).launch {
                     val user = userDao.getUserByLogin(true)
-                    user?.let{nonNullUser ->
-                        withContext(Dispatchers.Main){
+                    user?.let { nonNullUser ->
+                        withContext(Dispatchers.Main) {
                             userDao.updateUser(nonNullUser.id, false)
                             onLogoutClicked()
                             Toast.makeText(context, "You are logout now", Toast.LENGTH_SHORT).show()
@@ -221,19 +220,19 @@ fun BottomBarItem(
                     }
                 }
             )
-            .padding(top = 8.dp)
+            .padding(top = 5.dp)
     ) {
         Icon(
             imageVector = icon,
             contentDescription = label,
             tint = if (isSelected) Color.Black else Color.White,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(18.dp)
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = label,
             color = if (isSelected) Color.Black else Color.White,
-            fontSize = 14.sp
+            fontSize = 12.sp
         )
     }
 }
@@ -244,17 +243,25 @@ fun TopScreen(navController: NavController, popularMovieList: List<Movie>) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(280.dp)
+            .height(320.dp)
             .background(Color.Transparent)
     ) {
+        userLogin?.let {
+            Text(
+                text = "Hey Welcome ${it.name}",
+                color = Color.Black,
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
+            )
+        }
         Text(
             text = "Popular Movies",
             color = Color.Black,
             style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp)
+            modifier = Modifier.padding(start = 16.dp, bottom = 2.dp)
         )
         LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(4.dp) // Adjust the spacing as needed
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             items(popularMovieList) { movie ->
                 MovieItem(movie, onItemClick = {
@@ -294,7 +301,7 @@ fun MiddleScreen(navController: NavController, movieList: List<Movie>) {
             .fillMaxWidth()
             .height(240.dp)
             .background(Color.Transparent)
-            .padding(top = 8.dp)
+        //.padding(top = 2.dp)
     ) {
         Text(
             text = "Top Rated Movies",
@@ -323,7 +330,10 @@ fun CardsMid(navController: NavController, movieList: List<Movie>) {
 }
 
 @Composable
-fun BottomScreen(navController: NavController, nowPlayingMovieList: List<Movie>) {
+fun BottomScreen(
+    navController: NavController,
+    nowPlayingMovieList: List<Movie>
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -333,7 +343,7 @@ fun BottomScreen(navController: NavController, nowPlayingMovieList: List<Movie>)
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(end = 16.dp, bottom = 16.dp)
+                .padding(bottom = 2.dp)
         ) {
             Text(
                 text = "Now Playing Movies",
@@ -388,24 +398,7 @@ fun CardItem(cardData: CardData, onClick: () -> Unit) {
                 modifier = Modifier
                     .fillMaxSize()
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = cardData.title,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
         }
     }
 }
-
-/*@Preview
-@Composable
-fun PreviewRegisterScreen() {
-    MyFIlmTheme {
-        HomeScreen(navController = rememberNavController())
-    }
-}*/
 

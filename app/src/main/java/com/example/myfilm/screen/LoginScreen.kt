@@ -77,9 +77,13 @@ fun PreLoginScreen(navController: NavController){
         }
         if (user != null){
             userLogin = user
-            navController.navigate("home")
+            navController.navigate("home"){
+                popUpTo("home"){inclusive = true}
+            }
         } else{
-            navController.navigate("login")
+            navController.navigate("login"){
+                popUpTo("login"){inclusive = true}
+            }
         }
     }
 }
