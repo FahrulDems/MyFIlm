@@ -204,6 +204,20 @@ fun RegisterScreen(navController: NavController) {
 
                     val input = registrationInput.value
 
+                    val email = registrationInput.value.email
+                    val password = registrationInput.value.password
+
+                    if (!email.contains("@")) {
+                        Toast.makeText(context, "Email Adress is not valid", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+
+                    val passwordPattern = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}\$")
+                    if (!password.matches(passwordPattern)) {
+                        Toast.makeText(context, "Minimum 8 characters, at least one (A), one (a), one (1) and one ($)", Toast.LENGTH_LONG).show()
+                        return@Button
+                    }
+
                     if (input.name.isNotEmpty() &&
                         input.email.isNotEmpty() &&
                         input.password.isNotEmpty()) {

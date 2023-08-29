@@ -24,5 +24,7 @@ data class MovieEntity(
     val poster_path: String,
     val overview: String,
     val release_date: String,
-    val user_id: Int
+    val user_id: Int,
+    val vote_average: Double,
+    val vote_count: Int
 )

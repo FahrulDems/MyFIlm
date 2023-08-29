@@ -43,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -126,7 +127,6 @@ fun HomeScreen(navController: NavController) {
             }
         }
 
-        // Place the BottomBar at the bottom of the screen
         BottomBar(
             selectedTab = selectedTab,
             onLogoutClicked = {
@@ -198,6 +198,22 @@ fun BottomBar(selectedTab: Int, onLogoutClicked: () -> Unit, onTabSelected: (Int
 }
 
 @Composable
+fun NullOrNotInternetConnection() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "Loading",
+            color = Color(0xFF7CE7AC),
+            style = MaterialTheme.typography.headlineSmall,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(16.dp)
+        )
+    }
+}
+
+@Composable
 fun BottomBarItem(
     icon: ImageVector,
     label: String,
@@ -248,10 +264,11 @@ fun TopScreen(navController: NavController, popularMovieList: List<Movie>) {
     ) {
         userLogin?.let {
             Text(
-                text = "Hey Welcome ${it.name}",
+                text = "Hey Welcome, ${it.name}",
                 color = Color.Black,
                 style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
+                modifier = Modifier
+                    .padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
             )
         }
         Text(
@@ -260,14 +277,18 @@ fun TopScreen(navController: NavController, popularMovieList: List<Movie>) {
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.padding(start = 16.dp, bottom = 2.dp)
         )
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            items(popularMovieList) { movie ->
-                MovieItem(movie, onItemClick = {
-                    navController.navigate("detail/${movie.id}")
-                })
+        if (popularMovieList.isNotEmpty()) {
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                items(popularMovieList) { movie ->
+                    MovieItem(movie, onItemClick = {
+                        navController.navigate("detail/${movie.id}")
+                    })
+                }
             }
+        } else {
+            NullOrNotInternetConnection()
         }
     }
 }
@@ -275,15 +296,14 @@ fun TopScreen(navController: NavController, popularMovieList: List<Movie>) {
 @Composable
 fun MovieItem(movie: Movie, onItemClick: (String) -> Unit) {
     val imageUrl = "https://image.tmdb.org/t/p/w500/${movie.poster_path}"
-    Box(
+    Card(
+        border = BorderStroke(2.dp, Color.Yellow),
         modifier = Modifier
-            .width(150.dp) // Increase the width for larger images
+            .width(160.dp)
             .fillMaxHeight()
-            //.padding(start = 16.dp, end = 8.dp)
             .clickable(onClick = {
                 onItemClick(movie.id.toString())
             }),
-        contentAlignment = Alignment.Center
     ) {
         Image(
             painter = rememberAsyncImagePainter(model = imageUrl),
@@ -299,9 +319,8 @@ fun MiddleScreen(navController: NavController, movieList: List<Movie>) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(240.dp)
+            .height(220.dp)
             .background(Color.Transparent)
-        //.padding(top = 2.dp)
     ) {
         Text(
             text = "Top Rated Movies",
@@ -309,7 +328,11 @@ fun MiddleScreen(navController: NavController, movieList: List<Movie>) {
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.padding(start = 16.dp)
         )
-        CardsMid(navController, movieList)
+        if (movieList.isNotEmpty()) {
+            CardsMid(navController, movieList)
+        }else{
+            NullOrNotInternetConnection()
+        }
     }
 }
 
@@ -351,10 +374,12 @@ fun BottomScreen(
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.padding(start = 16.dp)
             )
-
-            // Use Spacer to push the following content to the bottom
             Spacer(modifier = Modifier.weight(1f))
-            CardsBottom(navController, nowPlayingMovieList)
+            if (nowPlayingMovieList.isNotEmpty()){
+                CardsBottom(navController, nowPlayingMovieList)
+            }else{
+                NullOrNotInternetConnection()
+            }
         }
     }
 }
@@ -380,7 +405,7 @@ data class CardData(val title: String, val image: String, val description: Strin
 @Composable
 fun CardItem(cardData: CardData, onClick: () -> Unit) {
     Card(
-        border = BorderStroke(2.dp, Color.Gray),
+        border = BorderStroke(2.dp, Color.Yellow),
         modifier = Modifier
             .width(140.dp)
             .height(200.dp)
@@ -389,7 +414,6 @@ fun CardItem(cardData: CardData, onClick: () -> Unit) {
     ) {
         Column(
             modifier = Modifier
-                //.padding(8.dp)
                 .clickable(onClick = onClick)
         ) {
             Image(

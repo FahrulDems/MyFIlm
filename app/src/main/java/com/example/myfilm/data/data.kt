@@ -26,7 +26,7 @@ interface MovieApiService {
     @GET("movie/popular?language=en-US&page=1")
     suspend fun getPopularMovies(@Header("Authorization") authorozation: String): MovieResponse
 
-    @GET("movie/top_rated?language=en-US&page=5")
+    @GET("movie/top_rated?language=en-US&page=2")
     suspend fun getTopRatedMovies(@Header("Authorization") authorozation: String): MovieResponse
 
     @GET("movie/now_playing?language=en-USpage=1")

@@ -53,7 +53,6 @@ fun DetailScreen(navController: NavController, itemId: String) {
     val isFavorite = remember { mutableStateOf(false) }
     val movieDao = (context.applicationContext as MyApplication).database.movieDao()
     var movieList by remember { mutableStateOf<List<MovieEntity>?>(null) }
-
     LaunchedEffect(key1 = true) {
         val response = movieApiService.getDetailMovies(authorozationHeader, itemId)
         movieDetail.value = response
@@ -109,9 +108,11 @@ fun DetailScreen(navController: NavController, itemId: String) {
                     ) {
                         IconButton(
                             onClick = {
+                                val userDao =
+                                    (context.applicationContext as MyApplication).database.userDao()
+                                val movieDao =
+                                    (context.applicationContext as MyApplication).database.movieDao()
                                 if (!isFavorite.value) {
-                                    val userDao =
-                                        (context.applicationContext as MyApplication).database.userDao()
 
                                     CoroutineScope(Dispatchers.IO).launch {
                                         val user = userDao.getUserByLogin(true)
@@ -122,6 +123,8 @@ fun DetailScreen(navController: NavController, itemId: String) {
                                                 poster_path = movie.poster_path,
                                                 overview = movie.overview,
                                                 release_date = movie.release_date,
+                                                vote_average = movie.vote_average,
+                                                vote_count = movie.vote_count,
                                                 user_id = nonNullUser.id
                                             )
                                             movieDao.insertMovieFav(movieEntity)
@@ -133,10 +136,19 @@ fun DetailScreen(navController: NavController, itemId: String) {
                                     Toast.makeText(context, "Add to your favorite", Toast.LENGTH_SHORT)
                                         .show()
                                 } else {
-                                    Toast.makeText(context, "This movie is already in your favorite list", Toast.LENGTH_SHORT)
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        val user = userDao.getUserByLogin(true)
+                                        val movies = movieDao.getAllByUserId(user.id)
+                                        for (movieFav in movies!!) {
+                                            if (movieFav.movie_id == movie.id) {
+                                                movieDao.deleteMovieFav(movie.id)
+                                            }
+                                        }
+                                    }
+                                    isFavorite.value = false
+                                    Toast.makeText(context, "Remove from your favorite", Toast.LENGTH_SHORT)
                                         .show()
                                 }
-
                             }
                         ) {
                             Icon(

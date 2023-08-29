@@ -256,11 +256,3 @@ fun LoginScreen(onRegisterButtonClicked: () -> Unit, onLoginButtonClicked: () ->
         }
     }
 }
-
-/*@Preview
-@Composable
-fun DefaultPreviewLoginScreen() {
-    MyFIlmTheme {
-        LoginScreen(onLoginButtonClicked = {}, onRegisterButtonClicked = {})
-    }
-}*/
